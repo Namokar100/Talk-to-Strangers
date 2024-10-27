@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema({
 
     language: {
         type: String,
+        enum: ["English"],
         required: true,
     },
 
@@ -84,9 +85,10 @@ const userSchema = new mongoose.Schema({
         ref: 'User'
     },
 
-    interests: [{  // References an Interest model for scalability
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Interest'
+    interests: [{ 
+        type: String,
+        enum: ["friendship", "love", "dating", "discussions", "geopolitics", "fitness", "technology", "gaming", "music", "movies", "travel"],
+        required: true,
     }],
 
     status: {
@@ -114,5 +116,9 @@ const userSchema = new mongoose.Schema({
 
     premiumExpiryDate: { // Optional field for time-bound premium subscriptions
         type: Date,
-    }
-});
+    },
+},
+{timestamps: true} 
+);
+
+module.exports = mongoose.model("user", userSchema);
