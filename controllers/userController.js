@@ -1,10 +1,11 @@
 // controllers/userController.js
 
-const User = require("../models/User"); // Import your User model
+const User = require("../models/User"); // Import the User model
 const userRegistrationData = {}; // Temporary storage for user registration data
 const ageOptions = Array.from({ length: 75 - 16 + 1 }, (_, i) => (i + 16).toString()); // Age options from 16 to 75
 const agePageSize = 12; // Number of age options to display per page
 const menuController = require("./menuController");
+const findPartnerController = require("./findPartnerController"); // Import findPartnerController
 
 exports.startChatting = (bot) => {
   bot.on('callback_query', async (callbackQuery) => {
@@ -12,10 +13,20 @@ exports.startChatting = (bot) => {
     const chatId = message.chat.id;
 
     if (callbackQuery.data === "start_chatting") {
-      userRegistrationData[chatId] = {}; // Initialize user data
-      askForGender(bot, chatId);
-    } 
-    
+      // Check if user is already registered
+      const existingUser = await User.findOne({ username: `User${chatId}` });
+
+      if (existingUser) {
+        // If user is already registered, direct them to find a partner
+        bot.sendMessage(chatId, "You are already registered. Click on Find Partner Button");
+      } else {
+        // If user is new, start the registration process
+        userRegistrationData[chatId] = {}; // Initialize user data
+        askForGender(bot, chatId);
+      }
+    }
+
+    // Rest of the callback_query handling remains the same
     else if (callbackQuery.data.startsWith("gender_")) {
       userRegistrationData[chatId].gender = callbackQuery.data.split("_")[1];
       userRegistrationData[chatId].agePage = 0; // Initialize age page
@@ -48,7 +59,6 @@ exports.startChatting = (bot) => {
     
     else if (callbackQuery.data === "finish_registration") {
       // Save the user data to the database
-    //   console.log("User details being stored!!")
       await saveUserData(chatId, userRegistrationData[chatId]);
       bot.sendMessage(chatId, "Thank you for providing your information! You are now registered.");
       delete userRegistrationData[chatId]; // Clean up temporary data
@@ -180,31 +190,28 @@ const askForInterests = (bot, chatId) => {
 
 // Function to save user data to the database
 const saveUserData = async (chatId, userData) => {
-    console.log("User data being saved:", userData); // Add this line to see the data
-  
-    // Check if userData is defined and contains the expected properties
-    if (!userData || !userData.gender || !userData.age || !userData.language || !userData.country || !userData.interests) {
-      console.error("User data is missing some required fields:", userData);
-      throw new Error("User data is incomplete.");
-    }
-  
-    // Create a new user instance
-    const user = new User({
-      username: `User${chatId}`,
-      gender: userData.gender,
-      age: userData.age,
-      language: userData.language,
-      country: userData.country,
-      interests: userData.interests,
-      createdAt: new Date()
-    });
-  
-    try {
-      await user.save();
-      console.log("User saved successfully:", user);
-    } catch (error) {
-      console.error("Error saving user data:", error);
-      throw new Error("Failed to save user data.");
-    }
-  };
-  
+  console.log("User data being saved:", userData); 
+
+  if (!userData || !userData.gender || !userData.age || !userData.language || !userData.country || !userData.interests) {
+    console.error("User data is missing some required fields:", userData);
+    throw new Error("User data is incomplete.");
+  }
+
+  const user = new User({
+    username: `User${chatId}`,
+    gender: userData.gender,
+    age: userData.age,
+    language: userData.language,
+    country: userData.country,
+    interests: userData.interests,
+    createdAt: new Date()
+  });
+
+  try {
+    await user.save();
+    console.log("User saved successfully:", user);
+  } catch (error) {
+    console.error("Error saving user data:", error);
+    throw new Error("Failed to save user data.");
+  }
+};
