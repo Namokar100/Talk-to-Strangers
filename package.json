@@ -17,6 +17,7 @@
     "node-telegram-bot-api": "^0.66.0",
     "nodemon": "^3.1.7",
     "router": "^1.3.8",
+    "talk-to-strangers": "file:",
     "telegraf": "^4.16.3"
   }
 }
