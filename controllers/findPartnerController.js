@@ -1,9 +1,11 @@
 const User = require("../models/User");
+const updateUser = require('./updateUserController');
 
 let userSessions = {}; // Store user session states
 let waitingUsers = []; // Queue to store users waiting for a partner
 let connectedUsers = {}; // Object to track connected users with their partners
 let disconnectionTimers = {}; // Track disconnection cooldowns
+// const updateUser = require('./updateUserController');
 
 // Show the main menu after registration
 exports.showMenu = (bot, chatId) => {
@@ -12,11 +14,11 @@ exports.showMenu = (bot, chatId) => {
       keyboard: [
         [
           { text: "Find Partner" },
-          { text: "Settings" }
+          { text: "Update" }
         ],
         [
-          { text: "Report" },
-          { text: "Help" }
+          { text: "Male" },
+          { text: "Female" }
         ]
       ],
       resize_keyboard: true, // Resize the keyboard for better fit
@@ -24,7 +26,7 @@ exports.showMenu = (bot, chatId) => {
     }
   };
 
-  bot.sendMessage(chatId, "Click on Find Partner Button to connect!", menuKeyboard)
+  bot.sendMessage(chatId, "Click on the required Button!", menuKeyboard)
     .catch(error => console.error("Error sending menu message:", error));
     
   userSessions[chatId] = { connected: false }; // Initialize user session state
@@ -42,17 +44,17 @@ exports.handleMenuActions = (bot) => {
           findPartner(bot, chatId);
           break;
 
-        case "Settings":
-          // Handle settings action
-          bot.sendMessage(chatId, "Settings feature is not yet implemented.");
+        case "Update":
+            updateUser.showUpdateOptions(bot, chatId);
+            exports.showMenu(bot, chatId);
           break;
 
-        case "Report":
+        case "Find Male":
           // Handle report action
           bot.sendMessage(chatId, "Reporting feature is not yet implemented.");
           break;
 
-        case "Help":
+        case "Find Female":
           // Handle help action
           bot.sendMessage(chatId, "Help feature is not yet implemented.");
           break;

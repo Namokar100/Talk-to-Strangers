@@ -15,10 +15,21 @@ const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
 //routes
 const startRoutes = require("./routes/startRoutes")(bot);
 const userRoutes = require("./routes/userRoutes")(bot);
-
+// const findPartnerRoutes = require('./routes/findPartnerRoutes');
+// app.use('/api/partner', findPartnerRoutes);
 // const menuRoutes = require("./routes/menuRoutes")(bot);
+
+
 const findPartnerController = require("./controllers/findPartnerController");
+// Handle menu actions
+findPartnerController.handleMenuActions(bot);
+// Handle incoming messages
+findPartnerController.handleMessages(bot);
+
 const userUpdate = require("./controllers/updateUserController");
+//Handle update user
+userUpdate.handleCallbackQuery(bot);
+
 
 // Start Listening for Bot Commands
 bot.onText(/\/start/, (msg) => {
@@ -26,14 +37,8 @@ bot.onText(/\/start/, (msg) => {
   findPartnerController.showMenu(bot, chatId);
 });
 
-// Handle menu actions
-findPartnerController.handleMenuActions(bot);
-
-// Handle incoming messages
-findPartnerController.handleMessages(bot);
-
-//handle user update 
-userUpdate.updateProfile(bot);
+// handle user update 
+// userUpdate.updateProfile(bot);
 
 // Start server
 const PORT = process.env.PORT || 3000;

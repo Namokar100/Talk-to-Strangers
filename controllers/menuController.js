@@ -10,11 +10,11 @@ exports.showMenu = (bot, chatId) => {
       keyboard: [
         [
           { text: "Find Partner" },
-          { text: "Settings" }
+          // { text: "Settings" }
         ],
         [
-          { text: "Report" },
-          { text: "Help" }
+          { text: "Find Male" },
+          { text: "Find Female" }
         ]
       ],
       resize_keyboard: true, // Resize the keyboard for better fit

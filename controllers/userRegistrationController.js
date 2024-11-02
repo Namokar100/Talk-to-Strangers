@@ -18,66 +18,61 @@ exports.startChatting = (bot) => {
 
       if (existingUser) {
         // If user is already registered, direct them to find a partner
-        bot.sendMessage(chatId, "You are already registered. Click on Find Partner Button");
+        bot.sendMessage(chatId, "You are already registered. Click on Find Partner Button!");
       } else {
         // If user is new, start the registration process
         userRegistrationData[chatId] = {}; // Initialize user data
         askForGender(bot, chatId);
       }
-    }
+    } 
+    // Ensure that userRegistrationData[chatId] is initialized
+    else if (userRegistrationData[chatId]) { // Check if the user registration data exists
+      if (callbackQuery.data.startsWith("gender_")) {
+        userRegistrationData[chatId].gender = callbackQuery.data.split("_")[1];
+        userRegistrationData[chatId].agePage = 0; // Initialize age page
+        askForAge(bot, chatId);
+      } 
+      else if (callbackQuery.data.startsWith("age_")) {
+        userRegistrationData[chatId].age = callbackQuery.data.split("_")[1];
+        askForLanguage(bot, chatId);
+      } 
+      else if (callbackQuery.data.startsWith("language_")) {
+        userRegistrationData[chatId].language = callbackQuery.data.split("_")[1];
+        askForCountry(bot, chatId);
+      } 
+      else if (callbackQuery.data.startsWith("country_")) {
+        userRegistrationData[chatId].country = callbackQuery.data.split("_")[1];
+        askForInterests(bot, chatId);
+      } 
+      else if (callbackQuery.data.startsWith("interest_")) {
+        const interest = callbackQuery.data.split("_")[1];
+        if (!userRegistrationData[chatId].interests) {
+          userRegistrationData[chatId].interests = [];
+        }
+        userRegistrationData[chatId].interests.push(interest);
+        bot.sendMessage(chatId, `${interest} added. Click on finish Registration to end profile setup`);
+      } 
+      else if (callbackQuery.data === "finish_registration") {
+        // Save the user data to the database
+        await saveUserData(chatId, userRegistrationData[chatId]);
+        bot.sendMessage(chatId, "Thank you for providing your information! You are now registered.");
+        delete userRegistrationData[chatId]; // Clean up temporary data
 
-    // Rest of the callback_query handling remains the same
-    else if (callbackQuery.data.startsWith("gender_")) {
-      userRegistrationData[chatId].gender = callbackQuery.data.split("_")[1];
-      userRegistrationData[chatId].agePage = 0; // Initialize age page
-      askForAge(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data.startsWith("age_")) {
-      userRegistrationData[chatId].age = callbackQuery.data.split("_")[1];
-      askForLanguage(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data.startsWith("language_")) {
-      userRegistrationData[chatId].language = callbackQuery.data.split("_")[1];
-      askForCountry(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data.startsWith("country_")) {
-      userRegistrationData[chatId].country = callbackQuery.data.split("_")[1];
-      askForInterests(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data.startsWith("interest_")) {
-      const interest = callbackQuery.data.split("_")[1];
-      if (!userRegistrationData[chatId].interests) {
-        userRegistrationData[chatId].interests = [];
+        // Call the menu controller to show the main menu
+        menuController.showMenu(bot, chatId);
+      } 
+      else if (callbackQuery.data === "next_age") {
+        userRegistrationData[chatId].agePage++;
+        askForAge(bot, chatId);
+      } 
+      else if (callbackQuery.data === "prev_age") {
+        userRegistrationData[chatId].agePage--;
+        askForAge(bot, chatId);
       }
-      userRegistrationData[chatId].interests.push(interest);
-      bot.sendMessage(chatId, `${interest} added. Click on finish Registration to end profile setup`);
-    } 
-    
-    else if (callbackQuery.data === "finish_registration") {
-      // Save the user data to the database
-      await saveUserData(chatId, userRegistrationData[chatId]);
-      bot.sendMessage(chatId, "Thank you for providing your information! You are now registered.");
-      delete userRegistrationData[chatId]; // Clean up temporary data
-
-      // Call the menu controller to show the main menu
-      menuController.showMenu(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data === "next_age") {
-      userRegistrationData[chatId].agePage++;
-      askForAge(bot, chatId);
-    } 
-    
-    else if (callbackQuery.data === "prev_age") {
-      userRegistrationData[chatId].agePage--;
-      askForAge(bot, chatId);
     }
   });
 };
+
 
 // Prompt user for gender
 const askForGender = (bot, chatId) => {
