@@ -18,7 +18,7 @@ pipeline {
             steps {
                 // Navigate to the app directory and install dependencies
                 dir(APP_DIR) {
-                    sh 'npm install'
+                    bat 'npm install'
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 // Restart the server using PM2
                 dir(APP_DIR) {
-                    sh 'npm run start' // Adjust server entry point
+                    bat 'npm run start' // Adjust server entry point
                 }
             }
         }
