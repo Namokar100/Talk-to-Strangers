@@ -19,7 +19,10 @@ pipeline {
             steps {
                 // Navigate to the app directory and install dependencies
                 dir(APP_DIR) {
-                    bat 'npm install'
+                    bat '''
+                    echo Installing dependencies...
+                    npm install
+                    '''
                 }
             }
         }
@@ -28,7 +31,8 @@ pipeline {
                 // Use pm2 to restart the server
                 dir(APP_DIR) {
                     bat '''
-                    pm2 stop all || true
+                    echo Restarting PM2 server...
+                    pm2 stop all || echo No running processes to stop
                     pm2 start index.js --name tg-backend
                     '''
                 }
