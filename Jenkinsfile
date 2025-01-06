@@ -11,7 +11,8 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 // Pull the latest code from GitHub
-                git branch: 'main', credentialsId: 'github_credentials', url: 'https://github.com/Namokar100/Talk-to-Strangers.git'
+                echo "Pulling the latest code"
+                git branch: 'jk', credentialsId: 'github_credentials', url: 'https://github.com/Namokar100/Talk-to-Strangers.git'
             }
         }
         stage('Install Dependencies') {
@@ -26,7 +27,7 @@ pipeline {
             steps {
                 // Use pm2 to restart the server
                 dir(APP_DIR) {
-                    sh '''
+                    bat '''
                     pm2 stop all || true
                     pm2 start index.js --name tg-backend
                     '''
