@@ -32,7 +32,7 @@ pipeline {
                 dir(APP_DIR) {
                     bat '''
                     echo Restarting PM2 server...
-                    pm2 stop all || echo No running processes to stop
+                    // pm2 stop all || echo No running processes to stop
                     pm2 start index.js --name tg-backend
                     '''
                 }
