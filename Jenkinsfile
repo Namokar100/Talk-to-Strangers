@@ -24,9 +24,12 @@ pipeline {
         }
         stage('Restart Server') {
             steps {
-                // Restart the server using PM2
+                // Use pm2 to restart the server
                 dir(APP_DIR) {
-                    bat 'npm run start' // Adjust server entry point
+                    sh '''
+                    pm2 stop all || true
+                    pm2 start index.js --name tg-backend
+                    '''
                 }
             }
         }
